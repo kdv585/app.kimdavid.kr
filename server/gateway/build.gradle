@@ -11,6 +11,9 @@ dependencies {
 	// Spring Cloud LoadBalancer (리액티브 서비스 디스커버리)
 	implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
 	
+	// Resilience4j Circuit Breaker (서킷 브레이커 및 재시도 기능)
+	implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-reactor-resilience4j'
+	
 	// SpringDoc OpenAPI (Swagger for WebFlux)
 	implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0'
 	

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth 로그인 테스트</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .card {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        .card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        .card h2 {
+            margin-top: 0;
+            color: #667eea;
+            font-size: 20px;
+        }
+        .card p {
+            color: #666;
+            line-height: 1.6;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+        .btn:hover {
+            background: #5568d3;
+        }
+        .btn-naver {
+            background: #03c75a;
+        }
+        .btn-naver:hover {
+            background: #02b350;
+        }
+        .btn-kakao {
+            background: #fee500;
+            color: #000;
+        }
+        .btn-kakao:hover {
+            background: #fdd835;
+        }
+        .btn-google {
+            background: #4285f4;
+        }
+        .btn-google:hover {
+            background: #357ae8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 OAuth 로그인 테스트</h1>
+        
+        <div class="card">
+            <h2>🟢 네이버 로그인</h2>
+            <p>네이버 계정으로 로그인을 테스트합니다.</p>
+            <a href="/naver-login-test.html" class="btn btn-naver">네이버 로그인 테스트 →</a>
+        </div>
+
+        <div class="card">
+            <h2>💬 카카오 로그인</h2>
+            <p>카카오 계정으로 로그인 (프론트엔드에서 테스트)</p>
+            <a href="http://localhost:3000" class="btn btn-kakao">프론트엔드로 이동 →</a>
+        </div>
+
+        <div class="card">
+            <h2>🔵 구글 로그인</h2>
+            <p>구글 계정으로 로그인 (준비 중)</p>
+            <button class="btn btn-google" disabled style="opacity: 0.5; cursor: not-allowed;">준비 중</button>
+        </div>
+
+        <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+            <h3 style="margin-top: 0;">📋 테스트 정보</h3>
+            <ul style="color: #666; line-height: 1.8;">
+                <li><strong>백엔드 Gateway:</strong> http://localhost:8080</li>
+                <li><strong>Auth Service:</strong> http://localhost:8081</li>
+                <li><strong>프론트엔드:</strong> http://localhost:3000</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
+

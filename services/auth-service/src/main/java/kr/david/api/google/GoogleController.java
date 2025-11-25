@@ -1,4 +1,4 @@
-package kr.david.api.kakao;
+package kr.david.api.google;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
@@ -11,48 +11,48 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/auth/kakao")
-public class KakaoController {
+@RequestMapping("/auth/google")
+public class GoogleController {
 
-    private final KakaoService kakaoService;
+    private final GoogleService googleService;
 
-    public KakaoController(KakaoService kakaoService) {
-        this.kakaoService = kakaoService;
+    public GoogleController(GoogleService googleService) {
+        this.googleService = googleService;
     }
 
     /**
-     * 카카오 로그인 시작
+     * 구글 로그인 시작
      * 프론트엔드에서 redirect_uri와 함께 호출
-     * 예: GET /api/auth/kakao?redirect_uri=http://localhost:3000/auth/kakao/callback
+     * 예: GET /api/auth/google?redirect_uri=http://localhost:3000/auth/google/callback
      */
     @GetMapping
-    public RedirectView kakaoLogin(
-            @RequestParam(required = false, defaultValue = "http://localhost:3000/auth/kakao/callback") String redirect_uri,
+    public RedirectView googleLogin(
+            @RequestParam(required = false, defaultValue = "http://localhost:3000/auth/google/callback") String redirect_uri,
             HttpSession session) {
-        System.out.println("카카오 로그인 요청: redirect_uri=" + redirect_uri);
+        System.out.println("구글 로그인 요청: redirect_uri=" + redirect_uri);
         // 프론트엔드 redirect_uri를 세션에 저장
-        session.setAttribute("frontend_redirect_uri", redirect_uri);
+        session.setAttribute("google_frontend_redirect_uri", redirect_uri);
 
-        // 카카오 인증 페이지로 리다이렉트
-        String loginUrl = kakaoService.getKakaoLoginUrl(redirect_uri);
+        // 구글 인증 페이지로 리다이렉트
+        String loginUrl = googleService.getGoogleLoginUrl(redirect_uri);
         return new RedirectView(loginUrl);
     }
 
     /**
-     * 카카오 로그인 콜백 처리
-     * 카카오 인증 후 리다이렉트되는 엔드포인트
+     * 구글 로그인 콜백 처리
+     * 구글 인증 후 리다이렉트되는 엔드포인트
      * 프론트엔드로 code와 함께 리다이렉트
      */
     @GetMapping("/callback")
-    public RedirectView kakaoCallback(
+    public RedirectView googleCallback(
             @RequestParam String code,
             @RequestParam(required = false) String state,
             HttpSession session) {
         try {
             // 세션에서 프론트엔드 redirect_uri 가져오기
-            String frontendRedirectUri = (String) session.getAttribute("frontend_redirect_uri");
+            String frontendRedirectUri = (String) session.getAttribute("google_frontend_redirect_uri");
             if (frontendRedirectUri == null) {
-                frontendRedirectUri = "http://localhost:3000/auth/kakao/callback";
+                frontendRedirectUri = "http://localhost:3000/auth/google/callback";
             }
 
             // code를 프론트엔드로 전달
@@ -60,9 +60,9 @@ public class KakaoController {
             return new RedirectView(redirectUrl);
         } catch (Exception e) {
             // 에러 발생 시 프론트엔드로 에러 전달
-            String frontendRedirectUri = (String) session.getAttribute("frontend_redirect_uri");
+            String frontendRedirectUri = (String) session.getAttribute("google_frontend_redirect_uri");
             if (frontendRedirectUri == null) {
-                frontendRedirectUri = "http://localhost:3000/auth/kakao/callback";
+                frontendRedirectUri = "http://localhost:3000/auth/google/callback";
             }
             String redirectUrl = frontendRedirectUri + "?error="
                     + URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
@@ -71,12 +71,12 @@ public class KakaoController {
     }
 
     /**
-     * 카카오 로그인 완료 처리
+     * 구글 로그인 완료 처리
      * 프론트엔드에서 code를 받아서 로그인 처리
-     * POST /api/auth/kakao/login
+     * POST /api/auth/google/login
      */
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> kakaoLoginComplete(@RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> googleLoginComplete(@RequestBody Map<String, String> request) {
         try {
             String code = request.get("code");
             if (code == null || code.isEmpty()) {
@@ -86,11 +86,11 @@ public class KakaoController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            // 카카오 액세스 토큰 발급
-            KakaoTokenResponse tokenResponse = kakaoService.getAccessToken(code);
+            // 구글 액세스 토큰 발급
+            GoogleTokenResponse tokenResponse = googleService.getAccessToken(code);
 
             // 사용자 정보 조회
-            KakaoUserInfo userInfo = kakaoService.getUserInfo(tokenResponse.getAccessToken());
+            GoogleUserInfo userInfo = googleService.getUserInfo(tokenResponse.getAccessToken());
 
             // TODO: 사용자 정보를 DB에 저장/조회하고 JWT 토큰 발급
             // 여기서는 간단히 사용자 정보만 반환
@@ -109,3 +109,4 @@ public class KakaoController {
         }
     }
 }
+

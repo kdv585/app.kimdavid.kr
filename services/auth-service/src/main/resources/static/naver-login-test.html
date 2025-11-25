@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>네이버 로그인 테스트</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #00c73c 0%, #03c75a 100%);
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        h1 {
+            color: #03c75a;
+            margin-bottom: 30px;
+        }
+        .info {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .info p {
+            margin: 10px 0;
+            word-break: break-all;
+        }
+        .info strong {
+            color: #03c75a;
+        }
+        .btn-naver {
+            background: #03c75a;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: background 0.3s;
+        }
+        .btn-naver:hover {
+            background: #02b350;
+        }
+        .btn-naver svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+        .note {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            color: #856404;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🟢 네이버 로그인 테스트</h1>
+        
+        <div class="info">
+            <p><strong>Client ID:</strong> <span id="clientId">로딩 중...</span></p>
+            <p><strong>Redirect URI:</strong> <span id="redirectUri">로딩 중...</span></p>
+            <p><strong>State:</strong> <span id="state">로딩 중...</span></p>
+        </div>
+
+        <button class="btn-naver" onclick="naverLogin()">
+            <svg viewBox="0 0 24 24">
+                <path d="M16.273 12.845L7.376 0H0v24h7.726V11.156L16.624 24H24V0h-7.727v12.845z"/>
+            </svg>
+            네이버로 로그인
+        </button>
+
+        <div class="note">
+            ⚠️ 네이버 개발자 센터에서 Client ID와 Redirect URI를 먼저 등록해주세요!
+        </div>
+    </div>
+
+    <script>
+        // 랜덤 state 생성
+        function generateState() {
+            return Math.random().toString(36).substring(2, 15) + 
+                   Math.random().toString(36).substring(2, 15);
+        }
+
+        // 페이지 로드 시 정보 표시
+        window.onload = function() {
+            const state = generateState();
+            sessionStorage.setItem('naver_state', state);
+            
+            // 정보 표시
+            document.getElementById('clientId').textContent = 'YOUR_CLIENT_ID (서버에서 자동으로 사용)';
+            document.getElementById('redirectUri').textContent = 'http://localhost:8080/oauth2/naver/callback';
+            document.getElementById('state').textContent = state;
+        };
+
+        // 네이버 로그인
+        function naverLogin() {
+            // 백엔드 API로 리다이렉트 (백엔드에서 네이버로 리다이렉트)
+            const redirectUri = encodeURIComponent('http://localhost:3000/auth/naver');
+            window.location.href = `http://localhost:8080/api/auth/naver?redirect_uri=${redirectUri}`;
+        }
+    </script>
+</body>
+</html>
+

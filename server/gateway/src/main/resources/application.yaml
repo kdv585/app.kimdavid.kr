@@ -6,17 +6,114 @@ spring:
       server:
         webflux:
           routes:
-            - id: auth-service
-              uri: http://auth-service:8081
+            # Auth Service 라우트 (서브라우터 구조)
+            - id: auth-service-route
+              uri: lb://auth-service
               predicates:
                 - Path=/api/auth/**
-            - id: user-service
-              uri: http://user-service:8082
+              filters:
+                - RewritePath=/api/(?<segment>.*), /$\{segment}
+                - name: CircuitBreaker
+                  args:
+                    name: authServiceCircuitBreaker
+                    fallbackUri: forward:/fallback/auth
+            
+            # OAuth2 Naver 라우트 (네이버 전용 콜백)
+            - id: oauth2-naver-route
+              uri: lb://auth-service
+              predicates:
+                - Path=/oauth2/naver/**
+              filters:
+                - RewritePath=/oauth2/naver/(?<segment>.*), /auth/naver/$\{segment}
+                - name: CircuitBreaker
+                  args:
+                    name: authServiceCircuitBreaker
+                    fallbackUri: forward:/fallback/auth
+            
+            # User Service 라우트 (서브라우터 구조)
+            - id: user-service-route
+              uri: lb://user-service
               predicates:
                 - Path=/api/users/**
+              filters:
+                - RewritePath=/api/(?<segment>.*), /$\{segment}
+                - name: CircuitBreaker
+                  args:
+                    name: userServiceCircuitBreaker
+                    fallbackUri: forward:/fallback/user
+          
+          # 글로벌 필터 설정
+          default-filters:
+            - name: Retry
+              args:
+                retries: 3
+                statuses: BAD_GATEWAY,GATEWAY_TIMEOUT
+                methods: GET,POST,PUT,DELETE
+                backoff:
+                  firstBackoff: 50ms
+                  maxBackoff: 500ms
+                  factor: 2
+                  basedOnPreviousValue: false
+    
+    # LoadBalancer 설정 (Static Service Discovery)
+    loadbalancer:
+      ribbon:
+        enabled: false
+      cache:
+        enabled: true
+        ttl: 35s
+        capacity: 256
+    
+    # 서비스 인스턴스 정적 등록 (Eureka 없이 사용)
+    discovery:
+      client:
+        simple:
+          instances:
+            # Auth Service 인스턴스들
+            auth-service:
+              - uri: http://auth-service:8081
+                metadata:
+                  zone: docker
+              # 추가 인스턴스 등록 예시 (스케일링 시)
+              # - uri: http://auth-service-2:8081
+            
+            # User Service 인스턴스들
+            user-service:
+              - uri: http://user-service:8082
+                metadata:
+                  zone: docker
+              # 추가 인스턴스 등록 예시 (스케일링 시)
+              # - uri: http://user-service-2:8082
 
 server:
   port: 8080
+
+# Resilience4j Circuit Breaker 설정
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5s
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+    instances:
+      authServiceCircuitBreaker:
+        baseConfig: default
+      userServiceCircuitBreaker:
+        baseConfig: default
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 3s
+    instances:
+      authServiceCircuitBreaker:
+        baseConfig: default
+      userServiceCircuitBreaker:
+        baseConfig: default
 
 springdoc:
   api-docs:
@@ -28,3 +125,14 @@ springdoc:
     tags-sorter: alpha
     try-it-out-enabled: true
   show-actuator: false
+
+# 로깅 설정
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG
+    org.springframework.web: DEBUG
+    reactor.netty.http.server: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
