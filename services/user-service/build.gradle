@@ -1,0 +1,14 @@
+// 플러그인과 기본 설정은 루트 build.gradle에서 상속받습니다
+// 서브모듈별 추가 설정이 필요한 경우 여기에 작성합니다
+
+dependencies {
+	// Spring Web (REST API)
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

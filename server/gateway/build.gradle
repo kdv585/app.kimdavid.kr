@@ -1,0 +1,24 @@
+// 플러그인과 기본 설정은 루트 build.gradle에서 상속받습니다
+// 서브모듈별 추가 설정이 필요한 경우 여기에 작성합니다
+
+dependencies {
+	// Spring Cloud Gateway WebFlux
+	implementation 'org.springframework.cloud:spring-cloud-starter-gateway-server-webflux'
+	
+	// Spring Boot WebFlux (Gateway는 WebFlux 기반)
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	
+	// Spring Cloud LoadBalancer (리액티브 서비스 디스커버리)
+	implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
+	
+	// SpringDoc OpenAPI (Swagger for WebFlux)
+	implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0'
+	
+	// 테스트 의존성
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
